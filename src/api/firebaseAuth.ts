@@ -1,8 +1,16 @@
 /**
  * Firebase Authentication Service
- * ─────────────────────────────────
- * This module is the ONLY place in this frontend that calls Firebase Auth APIs.
- * It acts as a thin adapter so that pages never import firebase directly.
+ * ---------------------------------
+ * ARCHITECTURE NOTE:
+ * yugvex.vercel.app and app.yugvex.vercel.app are different domains.
+ * Firebase Auth state (IndexedDB) is domain-scoped - the session
+ * created here is invisible to the software app.
+ *
+ * SOLUTION - ID Token Handoff:
+ * After every successful auth event, we fetch a fresh Firebase ID token
+ * (signed JWT, 1-hour TTL) and pass it to the software app's
+ * /auth/callback?token=... endpoint. The software app's Firebase Admin
+ * SDK verifies the token independently and creates its own server session.
  */
 
 import {
@@ -29,17 +37,12 @@ export interface SignupData {
   dob: string;
 }
 
-/**
- * Sign in or register via Google OAuth popup.
- * Firebase handles both new and returning users automatically.
- */
+/** Sign in via Google OAuth popup. */
 export async function signInWithGoogle(): Promise<UserCredential> {
   return signInWithPopup(auth, googleProvider);
 }
 
-/**
- * Login an existing user.
- */
+/** Login an existing user with email + password. */
 export async function loginWithEmail(
   email: string,
   password: string
@@ -49,7 +52,7 @@ export async function loginWithEmail(
 
 /**
  * Register a new user.
- * Sets the Firebase display-name to "name | @username" after account creation.
+ * Sets the Firebase displayName as "Full Name | @username".
  */
 export async function signupWithEmail(data: SignupData): Promise<UserCredential> {
   const credential = await createUserWithEmailAndPassword(
@@ -65,40 +68,34 @@ export async function signupWithEmail(data: SignupData): Promise<UserCredential>
   return credential;
 }
 
-/**
- * Sign the current user out and return to the landing login page.
- * This mirrors the NEXT_PUBLIC_AUTH_URL the software app uses for its proxy.
- */
+/** Sign out and return the user to the landing login page. */
 export async function signOutUser(): Promise<void> {
   await signOut(auth);
   window.location.href = `${LANDING_URL}/login`;
 }
 
 /**
- * Redirect into the Yugvex SaaS App after successful authentication.
+ * Redirect into the Yugvex Software App after successful authentication.
  *
- * WHY WE PASS THE TOKEN:
- * Firebase Auth state is stored in IndexedDB, which is domain-scoped.
- * appyugvex.vercel.app cannot read the session created on yugvex.vercel.app.
- * We get a short-lived Firebase ID token (1 hr) and hand it to the software
- * app's /auth/callback route. The app's Firebase Admin SDK verifies it,
- * creates a server-side session, then redirects the user to /dashboard.
+ * 1. Confirm a Firebase user exists on this domain.
+ * 2. Force-refresh the ID token (guarantees freshness, avoids stale tokens).
+ * 3. Redirect to /auth/callback on the software app with the token.
  *
- * This matches the proxy.ts pattern in the software app which expects a
- * verified Firebase ID token to establish the authenticated session.
+ * The software app receives the token, calls Firebase Admin verifyIdToken(),
+ * creates a server-side session, then sends the user to /dashboard.
  */
 export async function redirectToApp(): Promise<void> {
   const user = auth.currentUser;
 
   if (!user) {
-    // No active Firebase session — send back to login
     window.location.href = `${LANDING_URL}/login`;
     return;
   }
 
-  // forceRefresh=true ensures fresh token, not a cached one
-  const idToken = await user.getIdToken(true);
-
-  // Hand the token to the software app's auth callback endpoint
-  window.location.href = `${APP_URL}/auth/callback?token=${encodeURIComponent(idToken)}`;
+  try {
+    const idToken = await user.getIdToken(true);
+    window.location.href = `${APP_URL}/auth/callback?token=${encodeURIComponent(idToken)}`;
+  } catch {
+    window.location.href = `${LANDING_URL}/login`;
+  }
 }

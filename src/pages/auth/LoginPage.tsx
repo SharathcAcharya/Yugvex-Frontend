@@ -1,15 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import YugvexLogo from '../../components/brand/Logo';
 import { loginWithEmail, signInWithGoogle, redirectToApp } from '../../api/firebaseAuth';
 import GoogleAuthButton from '../../components/auth/GoogleAuthButton';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginPage = () => {
+  const { user, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
   const [googleLoading, setGoogleLoading] = useState(false);
+
+  // If Firebase resolves and user is already authenticated, go straight to app
+  useEffect(() => {
+    if (!loading && user) {
+      redirectToApp();
+    }
+  }, [user, loading]);
+
+  // Show spinner while Firebase resolves auth state
+  if (loading || user) {
+    return (
+      <div className="min-h-screen bg-surface-base flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
