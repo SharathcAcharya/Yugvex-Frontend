@@ -18,7 +18,8 @@ import {
 const googleProvider = new GoogleAuthProvider();
 import { auth } from '../lib/firebase';
 
-const APP_URL = 'http://localhost:3000';
+const APP_URL      = import.meta.env.VITE_APP_URL      ?? 'https://appyugvex.vercel.app';
+const LANDING_URL  = import.meta.env.VITE_LANDING_URL  ?? 'https://yugvex.vercel.app';
 
 export interface SignupData {
   name: string;
@@ -71,7 +72,7 @@ export async function signupWithEmail(data: SignupData): Promise<UserCredential>
  */
 export async function signOutUser(): Promise<void> {
   await signOut(auth);
-  window.location.href = '/';
+  window.location.href = LANDING_URL;
 }
 
 /**
