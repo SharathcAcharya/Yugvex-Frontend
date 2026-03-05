@@ -1,0 +1,232 @@
+@import "tailwindcss";
+
+@theme {
+  /* ═══════════════════════════════════════════════════════════════
+     YUGVEX DESIGN SYSTEM — Logo-First Color Architecture
+     
+     DESIGN PHILOSOPHY:
+     The logo defines the color universe. Background gradients are 
+     extracted from logo glow patterns (cyan→purple→pink) with 
+     deep indigo-violet base to create premium depth.
+     
+     INSPIRED BY: Discord, Linear, Vercel dark modes
+     ═══════════════════════════════════════════════════════════════ */
+  
+  /* ━━━ BRAND COLORS (Logo DNA) ━━━ */
+  
+  /* PRIMARY CYAN — Logo highlight & primary actions */
+  --color-brand-primary: #22D3EE;        /* Bright Cyan (logo glow core) */
+  --color-brand-primary-light: #67E8F9;  /* Hover state */
+  --color-brand-primary-dark: #0891B2;   /* Active/pressed */
+  
+  /* SECONDARY PURPLE — Logo gradient middle, premium accent */
+  --color-brand-secondary: #7C3AED;      /* Deep Violet (logo heart) */
+  --color-brand-secondary-light: #A78BFA; /* Lighter variant */
+  --color-brand-secondary-dark: #6D28D9; /* Darker variant */
+  
+  /* ACCENT PINK — Logo terminus, delight moments */
+  --color-brand-accent: #E879F9;         /* Soft Magenta */
+  --color-brand-accent-hot: #EC4899;     /* Hot Pink (CTAs) */
+  
+  /* ━━━ SURFACE COLORS (Lighter, Friendlier "Lifted" Dark Theme) ━━━ */
+  
+  /* Base: Deep Twilight Indigo (Not black, not grey - rich blue) */
+  --color-surface-base: #13172D;         /* Readable, social, deep blue */
+  --color-surface-raised: #1C2341;       /* Soft Indigo Panel */
+  --color-surface-elevated: #283055;     /* Lighter violet-blue for distinct cards */
+  
+  /* Glass morphism effects - Lighter & Friendlier */
+  --color-surface-glass: rgba(30, 35, 65, 0.6);  /* Semi-transparent indigo */
+  --color-surface-glass-border: rgba(124, 58, 237, 0.25); /* More visible border */
+  
+  /* ━━━ TEXT HIERARCHY (Optimized for Lighter Dark Theme) ━━━ */
+  --color-text-primary: #FFFFFF;         /* Crisp White */
+  --color-text-secondary: #CBD5E1;       /* Blue-ish Light Grey (Slate-300) */
+  --color-text-tertiary: #94A3B8;        /* Muted Blue-Grey (Slate-400) */
+  
+  /* ━━━ SEMANTIC GRADIENTS (Airy & diffused) ━━━ */
+  
+  /* Primary brand gradient (matches logo flow) */
+  --gradient-brand: linear-gradient(135deg, #22D3EE 0%, #7C3AED 50%, #E879F9 100%);
+  
+  /* Hero background (LIFTED: More ambient light, less void) */
+  --gradient-hero: 
+    radial-gradient(circle 1000px at 50% -10%, rgba(34, 211, 238, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 120% 80% at 80% 40%, rgba(124, 58, 237, 0.12) 0%, transparent 50%),
+    linear-gradient(180deg, #18203d 0%, #13172D 100%);
+  
+  /* Navbar background (Glassy but distinct) */
+  --gradient-navbar: 
+    linear-gradient(180deg, 
+      rgba(19, 23, 45, 0.85) 0%, 
+      rgba(19, 23, 45, 0.95) 100%
+    );
+  
+  /* Footer background (Slightly deeply tone to ground the page) */
+  --gradient-footer:
+    linear-gradient(180deg, #13172D 0%, #0F1224 100%);
+  
+  /* Section separators (Softer light leak) */
+  --gradient-section-glow:
+    radial-gradient(ellipse 70% 80% at 50% 50%, rgba(34, 211, 238, 0.08) 0%, transparent 70%);
+  
+  /* Card hover glow (More pronounced "active" feel) */
+  --gradient-card-hover:
+    radial-gradient(circle at 50% 0%, rgba(103, 232, 249, 0.15) 0%, transparent 60%);
+  
+  /* ━━━ TYPOGRAPHY ━━━ */
+  --font-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@layer base { 
+  /* ━━━ GLOBAL BACKGROUND (Lifted & Friendly) ━━━
+     Moves away from "void black" to "twilight blue".
+     This makes the app feel less intense and more social. */
+  body {
+    @apply text-text-secondary antialiased selection:bg-brand-primary selection:text-black;
+    background: var(--gradient-hero);
+    background-color: #13172D; /* Lighter Fallback */
+    background-attachment: fixed;
+    background-size: 100% 100%;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SURFACE TREATMENT — Lighter Atmospheric Layers
+   
+   Strategy: Lighter blues/indigos instead of near-blacks.
+   This reduces eye strain and feels more welcoming (Discord-like).
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.bg-surface-base {
+  background-color: #13172D;
+  background-image: 
+    radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(34, 211, 238, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 1200px 800px at 70% 30%, rgba(124, 58, 237, 0.06) 0%, transparent 60%);
+  background-attachment: fixed;
+}
+
+.bg-surface-raised {
+  background-color: #1C2341;
+  /* Subtle "lift" overlay for panels */
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), transparent);
+}
+
+.bg-surface-elevated {
+  background-color: #283055;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3); /* Softer shadow */
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   UTILITY CLASSES — Premium Component Treatments
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Glass morphism card (logo-tinted transparency) */
+.glass-panel {
+  @apply backdrop-blur-xl border rounded-3xl;
+  background: var(--color-surface-glass);
+  border-color: var(--color-surface-glass-border);
+}
+
+/* Brand text gradient (matches logo wordmark) */
+.text-brand-gradient {
+  @apply bg-gradient-to-r from-brand-primary via-brand-secondary-light to-brand-accent bg-clip-text text-transparent;
+}
+
+/* Navbar treatment (semi-transparent with logo atmosphere) */
+.navbar-glass {
+  background: var(--gradient-navbar);
+  backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--color-surface-glass-border);
+}
+
+/* Footer treatment (deepened with purple undertone) */
+.footer-surface {
+  background: var(--gradient-footer);
+  border-top: 1px solid rgba(124, 58, 237, 0.10);
+}
+
+/* Section glow band (subtle separator with logo energy) */
+.section-glow {
+  background: var(--gradient-section-glow);
+  height: 2px;
+  margin: 4rem 0;
+}
+
+/* Card hover effect (logo-inspired spotlight) */
+.card-hover-glow {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.card-hover-glow:hover::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  height: 200px;
+  background: var(--gradient-card-hover);
+  opacity: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCROLLBAR STYLING (Softer & cleaner)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #13172D; 
+}
+
+::-webkit-scrollbar-thumb {
+  background: #283055;
+  border-radius: 99px;
+  border: 2px solid #13172D;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3B4571;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   WHY THIS PALETTE WORKS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   
+   1. COLOR EXTRACTION:
+      - Logo glow = cyan (#22D3EE) → purple (#7C3AED) gradient
+      - Background inherits this flow with reduced opacity (4-12%)
+      
+   2. BASE TONE HARMONY:
+      - Deep indigo-violet (#0A0D1E) has purple undertone
+      - This naturally complements logo without competing
+      
+   3. LAYERED DEPTH:
+      - Multiple radial gradients create atmospheric depth
+      - Logo feels embedded, not pasted
+      
+   4. CONTRAST PRESERVATION:
+      - Dark base maintains readability
+      - Subtle glows add interest without overwhelming
+      
+   5. PREMIUM FEEL:
+      - Inspired by Discord's brand integration
+      - Linear's sophisticated dark mode
+      - Vercel's elegant restraint
+      
+   RESULT: Logo and background share the same color DNA.
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
