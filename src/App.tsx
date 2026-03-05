@@ -7,13 +7,6 @@ import LoginPage from './pages/auth/LoginPage';
 import MarketingLayout from './layouts/MarketingLayout';
 import { AuthProvider } from './context/AuthContext';
 
-// Simple loading spinner
-const PageLoader = () => (
-  <div className="min-h-screen bg-surface-base flex items-center justify-center">
-    <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
-  </div>
-);
-
 function App() {
   return (
     <AuthProvider>
