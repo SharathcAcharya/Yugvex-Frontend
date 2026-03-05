@@ -16,7 +16,7 @@ const LoginPage = () => {
     setError('');
     try {
       await signInWithGoogle();
-      redirectToApp();
+      await redirectToApp();
     } catch (err: any) {
       const msg = err.code === 'auth/popup-closed-by-user'
         ? 'Sign-in popup was closed. Please try again.'
@@ -33,8 +33,8 @@ const LoginPage = () => {
 
     try {
       await loginWithEmail(email, password);
-      // Firebase session persisted — redirect into the SaaS App
-      redirectToApp();
+      // Firebase ID token is fetched and passed to the app's /auth/callback
+      await redirectToApp();
     } catch (err: any) {
       const msg = err.code === 'auth/invalid-credential'
         ? 'Email or password is incorrect.'

@@ -21,7 +21,7 @@ const SignupPage = () => {
     setError('');
     try {
       await signInWithGoogle();
-      redirectToApp();
+      await redirectToApp();
     } catch (err: any) {
       const msg = err.code === 'auth/popup-closed-by-user'
         ? 'Sign-in popup was closed. Please try again.'
@@ -42,8 +42,8 @@ const SignupPage = () => {
 
     try {
       await signupWithEmail(formData);
-      // Firebase account created + session persisted — redirect into the SaaS App
-      redirectToApp();
+      // Firebase account created + ID token handed off to software app
+      await redirectToApp();
     } catch (err: any) {
       const msg = err.code === 'auth/email-already-in-use'
         ? 'An account with this email already exists.'
