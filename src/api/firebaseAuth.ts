@@ -18,7 +18,7 @@ import { auth } from '../lib/firebase';
 
 const googleProvider = new GoogleAuthProvider();
 
-const APP_URL     = import.meta.env.VITE_APP_URL     ?? 'https://appyugvex.vercel.app';
+const APP_URL     = import.meta.env.VITE_APP_URL     ?? 'https://app.yugvex.vercel.app';
 const LANDING_URL = import.meta.env.VITE_LANDING_URL ?? 'https://yugvex.vercel.app';
 
 export interface SignupData {
