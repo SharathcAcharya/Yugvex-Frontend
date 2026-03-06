@@ -1,16 +1,12 @@
 /**
  * Firebase Authentication Service
  * ---------------------------------
- * ARCHITECTURE NOTE:
- * yugvex.vercel.app and app.yugvex.vercel.app are different domains.
- * Firebase Auth state (IndexedDB) is domain-scoped - the session
- * created here is invisible to the software app.
+ * ARCHITECTURE:
+ * The landing app (yugvex.vercel.app) is a pure authentication gateway.
  *
- * SOLUTION - ID Token Handoff:
- * After every successful auth event, we fetch a fresh Firebase ID token
- * (signed JWT, 1-hour TTL) and pass it to the software app's
- * /auth/callback?token=... endpoint. The software app's Firebase Admin
- * SDK verifies the token independently and creates its own server session.
+ * After login it redirects the user to the software app dashboard.
+ * Firebase browserLocalPersistence is set on auth init (see lib/firebase.ts),
+ * so the session is stored in the browser and survives the redirect.
  */
 
 import {
@@ -75,14 +71,11 @@ export async function signOutUser(): Promise<void> {
 }
 
 /**
- * Redirect into the Yugvex Software App after successful authentication.
+ * Redirect the authenticated user into the Yugvex Software App.
  *
- * 1. Confirm a Firebase user exists on this domain.
- * 2. Force-refresh the ID token (guarantees freshness, avoids stale tokens).
- * 3. Redirect to /auth/callback on the software app with the token.
- *
- * The software app receives the token, calls Firebase Admin verifyIdToken(),
- * creates a server-side session, then sends the user to /dashboard.
+ * Firebase browserLocalPersistence (set in lib/firebase.ts) keeps the
+ * session alive across the navigation so the software app can verify it.
+ * No tokens are passed in the URL.
  */
 export async function redirectToApp(): Promise<void> {
   const user = auth.currentUser;
@@ -92,10 +85,5 @@ export async function redirectToApp(): Promise<void> {
     return;
   }
 
-  try {
-    const idToken = await user.getIdToken(true);
-    window.location.href = `${APP_URL}/auth/callback?token=${encodeURIComponent(idToken)}`;
-  } catch {
-    window.location.href = `${LANDING_URL}/login`;
-  }
+  window.location.href = `${APP_URL}/dashboard`;
 }
