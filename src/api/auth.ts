@@ -1,7 +1,7 @@
 // Simulation of backend API calls
 // In production, this would use fetch/axios to hit the real backend
 
-const APP_URL = import.meta.env.VITE_APP_URL ?? 'https://app.yugvex.vercel.app';
+const APP_URL = import.meta.env.VITE_APP_URL ?? 'https://app-yugvex.vercel.app';
 
 export interface User {
   id: string;
