@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import YugvexLogo from '../../components/brand/Logo';
 import { signupWithEmail, signInWithGoogle, redirectToApp } from '../../api/firebaseAuth';
 import GoogleAuthButton from '../../components/auth/GoogleAuthButton';
@@ -16,10 +16,12 @@ const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [googleLoading, setGoogleLoading] = useState(false);
+  // Ref guard: redirectToApp() fires exactly once regardless of re-renders.
+  const hasRedirected = useRef(false);
 
-  // If Firebase resolves and user is already authenticated, go straight to app
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user && !hasRedirected.current) {
+      hasRedirected.current = true;
       redirectToApp();
     }
   }, [user, loading]);
@@ -37,8 +39,8 @@ const SignupPage = () => {
     setGoogleLoading(true);
     setError('');
     try {
+      // signInWithGoogle() triggers onAuthStateChanged → useEffect handles redirect.
       await signInWithGoogle();
-      await redirectToApp();
     } catch (err: any) {
       const msg = err.code === 'auth/popup-closed-by-user'
         ? 'Sign-in popup was closed. Please try again.'
@@ -59,8 +61,7 @@ const SignupPage = () => {
 
     try {
       await signupWithEmail(formData);
-      // Firebase account created + ID token handed off to software app
-      await redirectToApp();
+      // signupWithEmail() triggers onAuthStateChanged → useEffect handles redirect.
     } catch (err: any) {
       const msg = err.code === 'auth/email-already-in-use'
         ? 'An account with this email already exists.'

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import YugvexLogo from '../../components/brand/Logo';
 import { loginWithEmail, signInWithGoogle, redirectToApp } from '../../api/firebaseAuth';
 import GoogleAuthButton from '../../components/auth/GoogleAuthButton';
@@ -11,10 +11,13 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [googleLoading, setGoogleLoading] = useState(false);
+  // Ref guard: ensures redirectToApp() is called exactly once per mount,
+  // regardless of how many times the effect re-fires (e.g. loading → false).
+  const hasRedirected = useRef(false);
 
-  // If Firebase resolves and user is already authenticated, go straight to app
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user && !hasRedirected.current) {
+      hasRedirected.current = true;
       redirectToApp();
     }
   }, [user, loading]);
@@ -32,8 +35,11 @@ const LoginPage = () => {
     setGoogleLoading(true);
     setError('');
     try {
+      // signInWithGoogle() triggers onAuthStateChanged → user is set in
+      // AuthContext → the useEffect above fires → redirectToApp() once.
       await signInWithGoogle();
-      await redirectToApp();
+      // Do NOT call redirectToApp() here — the useEffect is the sole
+      // redirect point, preventing a double-redirect race condition.
     } catch (err: any) {
       const msg = err.code === 'auth/popup-closed-by-user'
         ? 'Sign-in popup was closed. Please try again.'
@@ -50,8 +56,7 @@ const LoginPage = () => {
 
     try {
       await loginWithEmail(email, password);
-      // Firebase ID token is fetched and passed to the app's /auth/callback
-      await redirectToApp();
+      // loginWithEmail() triggers onAuthStateChanged → useEffect handles redirect.
     } catch (err: any) {
       const msg = err.code === 'auth/invalid-credential'
         ? 'Email or password is incorrect.'
