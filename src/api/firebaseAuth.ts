@@ -73,9 +73,13 @@ export async function signOutUser(): Promise<void> {
 /**
  * Redirect the authenticated user into the Yugvex Software App.
  *
- * Firebase browserLocalPersistence (set in lib/firebase.ts) keeps the
- * session alive across the navigation so the software app can verify it.
- * No tokens are passed in the URL.
+ * WHY tokens are needed: Firebase auth sessions live in IndexedDB, which
+ * is domain-scoped. A session on yugvex.vercel.app is invisible to
+ * app-yugvex.vercel.app. We pass a short-lived Firebase ID token (1-hour
+ * TTL) to the software app's server-side callback, which verifies it and
+ * creates a proper HttpOnly session cookie on that domain.
+ *
+ * No token is ever stored client-side on the software app domain.
  */
 export async function redirectToApp(): Promise<void> {
   const user = auth.currentUser;
@@ -85,5 +89,11 @@ export async function redirectToApp(): Promise<void> {
     return;
   }
 
-  window.location.href = `${APP_URL}/dashboard`;
+  try {
+    // Force-refresh ensures we always send a valid, non-expired token
+    const idToken = await user.getIdToken(true);
+    window.location.href = `${APP_URL}/api/auth/callback?token=${encodeURIComponent(idToken)}`;
+  } catch {
+    window.location.href = `${LANDING_URL}/login`;
+  }
 }
